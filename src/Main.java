@@ -4,15 +4,27 @@ import java.util.Random;
 
 class App {
 
-    private static final char[] BOX = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+    private final char[] BOX = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
     private static final int BOARD_SIZE = 9;
     private static final char PLAYER_MARK = 'X';
     private static final char COMPUTER_MARK = 'O';
-    private static final Scanner SCANNER = new Scanner(System.in);
-    private static final Logger logger = Logger.getLogger(App.class.getName());
-    private static final Random random = new Random();
+    private final Scanner scanner;
+    private final Logger logger;
+    private final Random random;
+
+    public App() {
+        this.scanner = new Scanner(System.in);
+        this.logger = Logger.getLogger(App.class.getName());
+        this.random = new Random();
+    }
 
     public static void main(String[] args) {
+        App app = new App();  // Створюємо екземпляр класу App
+        app.startGame();       // Викликаємо метод startGame на екземплярі
+    }
+
+
+    private void startGame() {
         logger.info("Enter box number to select. Enjoy!\n");
 
         while (true) {
@@ -36,10 +48,10 @@ class App {
 
             makeComputerMove();
         }
-        SCANNER.close(); // Закриття Scanner додає правильне управління ресурсами для запобігання потенційних витоків
+        scanner.close(); // Закриття Scanner додає правильне управління ресурсами для запобігання потенційних витоків
     }
 
-    private static void displayBoard() {
+    private void displayBoard() {
         System.out.println(String.format(
                 "%n%n %c | %c | %c %n-----------%n %c | %c | %c %n-----------%n %c | %c | %c %n",
                 BOX[0], BOX[1], BOX[2],
@@ -48,7 +60,7 @@ class App {
         ));
     }
 
-    private static int checkGameStatus() {       // зберігає всі можливі виграшні комбінації і перевіряє,
+    private int checkGameStatus() {       // зберігає всі можливі виграшні комбінації і перевіряє,
                                                  // чи є переможець. Це усуває дублювання та підвищує читабельність
         int[][] winningCombinations = {
                 {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Рядки
@@ -74,10 +86,10 @@ class App {
         return 3; // Нічия
     }
 
-    private static void makePlayerMove() {             // обробляє хід гравця з перевіркою введення
+    private void makePlayerMove() {             // обробляє хід гравця з перевіркою введення
         while (true) {
             logger.info("Enter your move (1-9): ");
-            byte input = SCANNER.nextByte();
+            byte input = scanner.nextByte();
             if (input > 0 && input <= BOARD_SIZE && isBoxFree(input - 1)) {
                 BOX[input - 1] = PLAYER_MARK;
                 break;
@@ -86,7 +98,7 @@ class App {
         }
     }
 
-    private static void makeComputerMove() {         // обробляє хід комп'ютера з випадковим вибором вільного поля
+    private void makeComputerMove() {         // обробляє хід комп'ютера з випадковим вибором вільного поля
         while (true) {
             int rand = random.nextInt(BOARD_SIZE);
             if (isBoxFree(rand)) {
@@ -96,11 +108,11 @@ class App {
         }
     }
 
-    private static boolean isBoxFree(int index) {
+    private boolean isBoxFree(int index) {
         return BOX[index] != PLAYER_MARK && BOX[index] != COMPUTER_MARK;
     }
 
-    private static void displayResult(int gameStatus) {
+    private void displayResult(int gameStatus) {
         displayBoard();
         switch (gameStatus) {
             case 1:
