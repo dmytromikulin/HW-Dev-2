@@ -1,4 +1,6 @@
 import java.util.Scanner;
+import java.util.logging.Logger;
+import java.util.Random;
 
 class App {
 
@@ -7,9 +9,11 @@ class App {
     private static final char PLAYER_MARK = 'X';
     private static final char COMPUTER_MARK = 'O';
     private static final Scanner SCANNER = new Scanner(System.in);
+    private static final Logger logger = Logger.getLogger(App.class.getName());
+    private static final Random random = new Random();
 
     public static void main(String[] args) {
-        System.out.println("Enter box number to select. Enjoy!\n");
+        logger.info("Enter box number to select. Enjoy!\n");
 
         while (true) {
             displayBoard();
@@ -22,6 +26,8 @@ class App {
 
             makePlayerMove();
             gameStatus = checkGameStatus();
+
+            // Перевіряємо статус гри після ходу гравця
             if (gameStatus != 0) {
                 displayBoard();
                 displayResult(gameStatus);
@@ -30,16 +36,16 @@ class App {
 
             makeComputerMove();
         }
-
-        SCANNER.close();     // Закриття Scanner додає правильне управління ресурсами для запобігання потенційних витоків
+        SCANNER.close(); // Закриття Scanner додає правильне управління ресурсами для запобігання потенційних витоків
     }
 
     private static void displayBoard() {
-        System.out.println("\n\n " + BOX[0] + " | " + BOX[1] + " | " + BOX[2]);
-        System.out.println("-----------");
-        System.out.println(" " + BOX[3] + " | " + BOX[4] + " | " + BOX[5]);
-        System.out.println("-----------");
-        System.out.println(" " + BOX[6] + " | " + BOX[7] + " | " + BOX[8] + " \n");
+        System.out.println(String.format(
+                "%n%n %c | %c | %c %n-----------%n %c | %c | %c %n-----------%n %c | %c | %c %n",
+                BOX[0], BOX[1], BOX[2],
+                BOX[3], BOX[4], BOX[5],
+                BOX[6], BOX[7], BOX[8]
+        ));
     }
 
     private static int checkGameStatus() {       // зберігає всі можливі виграшні комбінації і перевіряє,
@@ -70,19 +76,19 @@ class App {
 
     private static void makePlayerMove() {             // обробляє хід гравця з перевіркою введення
         while (true) {
-            System.out.print("Enter your move (1-9): ");
+            logger.info("Enter your move (1-9): ");
             byte input = SCANNER.nextByte();
             if (input > 0 && input <= BOARD_SIZE && isBoxFree(input - 1)) {
                 BOX[input - 1] = PLAYER_MARK;
                 break;
             }
-            System.out.println("Invalid input or box already taken. Please try again.");
+            logger.info("Invalid input or box already taken. Please try again.");
         }
     }
 
     private static void makeComputerMove() {         // обробляє хід комп'ютера з випадковим вибором вільного поля
         while (true) {
-            int rand = (int) (Math.random() * BOARD_SIZE);
+            int rand = random.nextInt(BOARD_SIZE);
             if (isBoxFree(rand)) {
                 BOX[rand] = COMPUTER_MARK;
                 break;
@@ -97,9 +103,17 @@ class App {
     private static void displayResult(int gameStatus) {
         displayBoard();
         switch (gameStatus) {
-            case 1 -> System.out.println("You won the game!\nThanks for playing!");
-            case 2 -> System.out.println("You lost the game!\nThanks for playing!");
-            case 3 -> System.out.println("It's a draw!\nThanks for playing!");
+            case 1:
+                logger.info("You won the game!\nThanks for playing!");
+                break;
+            case 2:
+                logger.info("You lost the game!\nThanks for playing!");
+                break;
+            case 3:
+                logger.info("It's a draw!\nThanks for playing!");
+                break;
+            default:
+                logger.warning("Invalid game status.");
         }
     }
 }
